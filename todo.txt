@@ -1,0 +1,7 @@
+1. infinite scroll
+2. login page , feed page
+3. dark mode
+4. mobile support
+5. deployment? 
+6. oauth 
+7. error pages 

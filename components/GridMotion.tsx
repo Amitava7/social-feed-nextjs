@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, FC, ReactNode, useState } from 'react';
+import { useEffect, useRef, FC, ReactNode, useState, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 
 interface GridMotionProps {
@@ -10,16 +10,24 @@ interface GridMotionProps {
 const GridMotion: FC<GridMotionProps> = ({ items = [], gradientColor = 'black' }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [innerWidth, setInnerWidth] = useState<number>(0);
+  const [innerWidth, setInnerWidth] = useState<number>(() => (typeof window !== 'undefined' ? window.innerWidth : 0));
   const mouseXRef = useRef<number>(innerWidth / 2);
 
   const totalItems = 28;
   const defaultItems = Array.from({ length: totalItems }, (_, index) => `Item ${index + 1}`);
   const combinedItems = items.length > 0 ? items.slice(0, totalItems) : defaultItems;
+  const handleResize = () => {
+    setInnerWidth(window.innerWidth);
+  };
+  useLayoutEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+    }
+  }, []);
 
   useEffect(() => {
     gsap.ticker.lagSmoothing(0);
-    setInnerWidth(window.innerWidth);
+
     const handleMouseMove = (e: MouseEvent): void => {
       mouseXRef.current = e.clientX;
     };
@@ -32,7 +40,7 @@ const GridMotion: FC<GridMotionProps> = ({ items = [], gradientColor = 'black' }
       rowRefs.current.forEach((row, index) => {
         if (row) {
           const direction = index % 2 === 0 ? 1 : -1;
-          const moveAmount = ((mouseXRef.current / window.innerWidth) * maxMoveAmount - maxMoveAmount / 2) * direction;
+          const moveAmount = ((mouseXRef.current / (window.innerWidth || 1)) * maxMoveAmount - maxMoveAmount / 2) * direction;
 
           gsap.to(row, {
             x: moveAmount,
@@ -49,6 +57,7 @@ const GridMotion: FC<GridMotionProps> = ({ items = [], gradientColor = 'black' }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
       removeAnimationLoop();
     };
   }, []);

@@ -72,7 +72,7 @@ function page() {
         Sign in
       </button>
       <p className="mt-3 text-center text-sm text-white/80">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <Link href="/signup" className="text-indigo-400 hover:underline">
           Sign up
         </Link>
