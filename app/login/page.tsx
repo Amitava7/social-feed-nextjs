@@ -1,34 +1,7 @@
 
 import GridMotion from '@/components/GridMotion';
 import Link from 'next/link';
-  
-const items = [
-"Friends",
-"Family",
-"Work",
-"Travel",
-"Fitness",
-"Hobbies",
-"Education",
-"Health",
-"Finance",
-"Shopping",
-"Entertainment",
-"Productivity",
-"Pets",
-"Nature",
-"Technology",
-"Food",
-"Art",
-"Music",
-"Sports",
-"Gaming",
-"Photography",
-"Fashion",
-"DIY",
-"Cars",
-"Movies",
-];
+
 
 async function submitAction(formData: FormData) {
   'use server';
@@ -41,7 +14,7 @@ async function submitAction(formData: FormData) {
 function page() {
   return (
   <>
-    <GridMotion items={items} />
+    <GridMotion />
     <div className="absolute inset-0 flex items-center justify-center z-20">
       <form className="w-80 bg-black/10 backdrop-blur-sm p-6 rounded-lg shadow-md" action={submitAction}>
       <h2 className="text-lg font-semibold mb-4 text-center">Login</h2>

@@ -1,13 +1,40 @@
 'use client';
-import { useEffect, useRef, FC, ReactNode, useState, useLayoutEffect } from 'react';
+import { useEffect, useRef, FC, useState, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 
 interface GridMotionProps {
-  items?: (string | ReactNode)[];
   gradientColor?: string;
 }
+  
+const items = [
+"Friends",
+"Family",
+"Work",
+"Travel",
+"Fitness",
+"Hobbies",
+"Education",
+"Health",
+"Finance",
+"Shopping",
+"Entertainment",
+"Productivity",
+"Pets",
+"Nature",
+"Technology",
+"Food",
+"Art",
+"Music",
+"Sports",
+"Gaming",
+"Photography",
+"Fashion",
+"DIY",
+"Cars",
+"Movies",
+];
 
-const GridMotion: FC<GridMotionProps> = ({ items = [], gradientColor = 'black' }) => {
+const GridMotion: FC<GridMotionProps> = ({ gradientColor = 'black' }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [innerWidth, setInnerWidth] = useState<number>(() => (typeof window !== 'undefined' ? window.innerWidth : 0));

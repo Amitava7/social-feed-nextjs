@@ -1,6 +1,6 @@
 import { User } from "@/database/user.model";
 import { dbConnect } from "@/lib/mongodb";
-
+import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 import z, { ZodError, treeifyError } from "zod";
 
@@ -11,22 +11,48 @@ const userSchema = z.object({
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(100, "Password too long"),
-  avatarUrl: z.url("Invalid URL").optional(),
+  avatar: z.file().min(50 * 1024).max(5 * 1024 * 1024).optional(),
 });
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
-    const body = await request.json();
-    const parsedData = userSchema.parse(body);
-    const existingUser = await User.findOne({ email: parsedData.email });
+    const formData = await request.formData();
+    const userData = Object.fromEntries(formData.entries());
+    const { displayName, email, password, avatar: file } = userSchema.parse(userData);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
         { message: "Email already in use" },
         { status: 400 }
       );
     }
-    User.create(parsedData);
+
+    if (file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const uploadResult: UploadApiResponse = await new Promise((res, rej) => {
+        cloudinary.uploader.upload_stream(
+          {
+            folder: "avatars",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error || !result)
+              rej(error);
+            else
+              res(result);
+          }
+        ).end(buffer);
+      });
+
+      User.create({
+        displayName,
+        email,
+        password,
+        avatarUrl: uploadResult.secure_url,
+      });
+    }
     return NextResponse.json(
       { message: "User created successfully" },
       { status: 201 }
