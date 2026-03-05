@@ -19,6 +19,9 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     const formData = await request.formData();
     const userData = Object.fromEntries(formData.entries());
+    if (userData.avatar instanceof File && userData.avatar.size === 0) {
+      delete userData.avatar;
+    }
     const { displayName, email, password, avatar: file } = userSchema.parse(userData);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -28,6 +31,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let avatarUrl: string | undefined;
     if (file) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -45,14 +49,15 @@ export async function POST(request: NextRequest) {
           }
         ).end(buffer);
       });
-
-      User.create({
-        displayName,
-        email,
-        password,
-        avatarUrl: uploadResult.secure_url,
-      });
+      avatarUrl = uploadResult.secure_url;
     }
+
+    await User.create({
+      displayName,
+      email,
+      password,
+      avatarUrl,
+    });
     return NextResponse.json(
       { message: "User created successfully" },
       { status: 201 }

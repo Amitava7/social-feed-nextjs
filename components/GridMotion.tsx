@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, FC, useState, useLayoutEffect } from 'react';
+import { useEffect, useRef, FC, useState } from 'react';
 import { gsap } from 'gsap';
 
 interface GridMotionProps {
@@ -46,10 +46,11 @@ const GridMotion: FC<GridMotionProps> = ({ gradientColor = 'black' }) => {
   const handleResize = () => {
     setInnerWidth(window.innerWidth);
   };
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
-    }
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -84,7 +85,6 @@ const GridMotion: FC<GridMotionProps> = ({ gradientColor = 'black' }) => {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
       removeAnimationLoop();
     };
   }, []);

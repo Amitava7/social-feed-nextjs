@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface IPost extends Document {
   user: mongoose.Types.ObjectId;
   title: string;
   mediaUrl?: string;
+  likes: mongoose.Types.ObjectId[];
   likesCount: number;
   commentsCount: number;
   createdAt: Date;
@@ -15,6 +16,7 @@ const PostSchema: mongoose.Schema = new mongoose.Schema<IPost>(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     mediaUrl: { type: String },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     likesCount: { type: Number, default: 0 },
     commentsCount: { type: Number, default: 0 },
   },
