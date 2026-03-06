@@ -8,8 +8,6 @@ import crypto from "crypto";
 import { Resend } from "resend";
 import { validateImageFile } from "@/lib/validate";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const userSchema = z.object({
   displayName: z.string().min(3).max(30),
   email: z.email("Invalid email address"),
@@ -70,6 +68,7 @@ export async function POST(request: NextRequest) {
 
     const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify-email?token=${token}`;
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: "Pulse <pulse.verification@amitava.info>",
       to: email,
