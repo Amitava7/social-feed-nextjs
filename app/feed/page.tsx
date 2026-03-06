@@ -8,6 +8,7 @@ import CreatePostModal from "@/components/CreatePostModal";
 import ProfileDropdown from "@/components/ProfileDropdown";
 
 export default function FeedPage() {
+  const [showWarning, setShowWarning] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +104,30 @@ export default function FeedPage() {
 
       <main className="pt-14 pb-24">
         <div className="max-w-[560px] mx-auto px-4 py-6 space-y-4">
+          {showWarning && (
+            <div className="relative bg-yellow-500/5 border border-yellow-500/20 rounded-2xl p-4 flex gap-3">
+              <div className="shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-yellow-500/80" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-yellow-500/90 text-sm font-medium">Proceed with caution</p>
+                <p className="text-yellow-500/50 text-xs mt-1 leading-relaxed">
+                  This is a personal hobby project. Content is user-generated and unmoderated. Anyone can upload anything. Do not share sensitive or personal information. The developer is not responsible for any content posted by users.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowWarning(false)}
+                className="shrink-0 text-yellow-500/30 hover:text-yellow-500/60 transition-colors"
+                aria-label="Dismiss warning"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div

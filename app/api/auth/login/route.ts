@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        { message: "Please verify your email before logging in" },
+        { status: 403 }
+      );
+    }
+
     const token = await signToken({
       sub: user._id.toString(),
       iat: Math.floor(Date.now() / 1000),

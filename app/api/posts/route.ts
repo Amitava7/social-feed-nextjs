@@ -1,6 +1,7 @@
 import { Post } from "@/database/post.model";
 import { dbConnect } from "@/lib/mongodb";
 import { getSessionUser } from "@/lib/auth";
+import { validateImageFile } from "@/lib/validate";
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
@@ -15,7 +16,11 @@ export async function GET(request: NextRequest) {
 
   const query: Record<string, unknown> = {};
   if (cursor) {
-    query.createdAt = { $lt: new Date(cursor) };
+    const cursorDate = new Date(cursor);
+    if (isNaN(cursorDate.getTime())) {
+      return NextResponse.json({ message: "Invalid cursor" }, { status: 400 });
+    }
+    query.createdAt = { $lt: cursorDate };
   }
 
   const posts = await Post.find(query)
@@ -57,12 +62,19 @@ export async function POST(request: NextRequest) {
   const title = (formData.get("title") as string | null)?.trim();
   const image = formData.get("image") as File | null;
 
-  if (!title) {
-    return NextResponse.json({ message: "Caption is required" }, { status: 400 });
+  if (!title || title.length > 500) {
+    return NextResponse.json(
+      { message: !title ? "Caption is required" : "Caption too long (max 500 chars)" },
+      { status: 400 }
+    );
   }
 
   let mediaUrl: string | undefined;
   if (image && image.size > 0) {
+    const imageError = validateImageFile(image);
+    if (imageError) {
+      return NextResponse.json({ message: imageError }, { status: 400 });
+    }
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const result: UploadApiResponse = await new Promise((res, rej) => {

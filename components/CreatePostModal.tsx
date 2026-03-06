@@ -85,7 +85,6 @@ export default function CreatePostModal({
                 className="relative rounded-xl overflow-hidden bg-[#1a1a1a] cursor-pointer"
                 onClick={() => fileRef.current?.click()}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={preview} alt="Preview" className="w-full max-h-64 object-cover" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                   <span className="text-white text-xs">Change image</span>

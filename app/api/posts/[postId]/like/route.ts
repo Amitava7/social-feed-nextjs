@@ -1,6 +1,7 @@
 import { Post } from "@/database/post.model";
 import { dbConnect } from "@/lib/mongodb";
 import { getSessionUser } from "@/lib/auth";
+import { isValidObjectId } from "@/lib/validate";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 
@@ -13,8 +14,12 @@ export async function POST(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  await dbConnect();
   const { postId } = await params;
+  if (!isValidObjectId(postId)) {
+    return NextResponse.json({ message: "Post not found" }, { status: 404 });
+  }
+
+  await dbConnect();
 
   const post = await Post.findById(postId);
   if (!post) {
